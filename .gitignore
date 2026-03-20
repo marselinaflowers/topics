@@ -32,6 +32,10 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
+lib/firebase_options.dart
+**/google-services.json
+**/GoogleService-Info.plist
+.firebaserc
 
 # Symbolication related
 app.*.symbols
