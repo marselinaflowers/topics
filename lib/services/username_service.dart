@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'slur_filter.dart';
 
 class UsernameService {
@@ -37,46 +35,4 @@ class UsernameService {
 
     return null;
   }
-
-  Future<void> reserveUsername({
-    required String username,
-    required String uid,
-  }) async {
-    final trimmed = username.trim();
-    final validationMessage = validationError(trimmed);
-    if (validationMessage != null) {
-      throw InvalidUsernameException(validationMessage);
-    }
-
-    final normalized = normalize(trimmed);
-    final docRef = FirebaseFirestore.instance
-        .collection('usernames')
-        .doc(normalized);
-
-    await FirebaseFirestore.instance.runTransaction((transaction) async {
-      final snapshot = await transaction.get(docRef);
-      if (snapshot.exists) {
-        final existingUid = snapshot.data()?['uid'] as String?;
-        if (existingUid != uid) {
-          throw UsernameTakenException();
-        }
-        return;
-      }
-
-      transaction.set(docRef, {
-        'uid': uid,
-        'username': normalized,
-        'normalized': normalized,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
-    });
-  }
-}
-
-class UsernameTakenException implements Exception {}
-
-class InvalidUsernameException implements Exception {
-  InvalidUsernameException(this.message);
-
-  final String message;
 }

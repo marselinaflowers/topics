@@ -115,23 +115,14 @@ class _AuthScreenState extends State<AuthScreen> {
         throw Exception('Anonymous sign-in returned no user.');
       }
 
-      await _usernameService.reserveUsername(
-        username: trimmedUsername,
-        uid: user.uid,
-      );
       await user.updateDisplayName(trimmedUsername);
 
       await user.reload();
-    } on UsernameTakenException {
+    } on FirebaseAuthException catch (error) {
       if (!mounted) {
         return;
       }
-      _setError('That username is already taken. Try another one.');
-    } on InvalidUsernameException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      _setError(error.message);
+      _setError(error.message ?? 'Authentication failed.');
     } catch (_) {
       if (!mounted) {
         return;
